@@ -1,0 +1,321 @@
+/* ===================== TradeVale — style.css ===================== */
+/* Palette (token system)
+   --wood-dark:  #241812   deep pawnshop wood, UI panel base
+   --wood-mid:   #3d2a1c   panel bevels
+   --brass:      #d9a441   currency / accents / borders
+   --brass-dim:  #8a672a   pressed / disabled brass
+   --canvas-sky: #cfe8d8   daylight market sky (muted, not neon)
+   --paper:      #eee2c6   ticket / dialogue paper
+   --ember:      #c1502e   action / interact accent
+   --ink:        #241812   text on paper
+*/
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  margin: 0; padding: 0; width: 100%; height: 100%;
+  background: #0d0906;
+  overflow: hidden;
+  font-family: 'Courier New', ui-monospace, monospace;
+  touch-action: none;
+  user-select: none;
+}
+
+#app {
+  position: fixed; inset: 0;
+  display: flex;
+  flex-direction: row;
+}
+
+/* ---------- portrait rotate notice ---------- */
+#rotateNotice {
+  position: fixed; inset: 0; z-index: 999;
+  background: #0d0906;
+  color: #d9a441;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  padding: 24px;
+}
+@media (orientation: portrait) {
+  #rotateNotice { display: flex; }
+  #app { display: none; }
+}
+#rotateNotice .icon { font-size: 42px; margin-bottom: 12px; animation: rotatePulse 1.6s ease-in-out infinite; }
+@keyframes rotatePulse { 0%,100%{ transform: rotate(0deg); } 50%{ transform: rotate(90deg); } }
+#rotateNotice h2 { margin: 0 0 6px; letter-spacing: 1px; }
+#rotateNotice p { margin: 0; color: #8a672a; font-size: 13px; }
+
+/* ===================== LEFT MENU PANEL ===================== */
+#menuPanel {
+  width: 34%;
+  min-width: 260px;
+  max-width: 360px;
+  height: 100%;
+  background:
+    linear-gradient(180deg, #2c1e15 0%, #241812 100%);
+  border-right: 4px solid #d9a441;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  gap: 8px;
+  overflow: hidden;
+  position: relative;
+}
+
+.brand {
+  display: flex; align-items: baseline; justify-content: space-between;
+  border-bottom: 2px dashed #8a672a;
+  padding-bottom: 6px;
+}
+.brand h1 {
+  color: #d9a441; font-size: 20px; margin: 0; letter-spacing: 2px;
+  text-shadow: 2px 2px 0 #0d0906;
+}
+.brand .tag { color: #7a8f7f; font-size: 9px; letter-spacing: 1px; }
+
+/* wallet / status strip */
+#statusStrip {
+  display: flex; justify-content: space-between; align-items: center;
+  background: #1a1109;
+  border: 2px solid #4a3620;
+  border-radius: 4px;
+  padding: 6px 8px;
+  color: #eee2c6;
+  font-size: 11px;
+}
+#statusStrip .coins { color: #d9a441; font-weight: bold; }
+#zoneLabel {
+  color: #eee2c6; font-size: 13px; text-align: center;
+  background: #1a1109; border: 2px solid #4a3620; border-radius: 4px;
+  padding: 5px 6px; letter-spacing: 1px;
+}
+#zoneLabel span { color: #c1502e; }
+
+/* dialogue / ticket box */
+#dialogueBox {
+  background: #eee2c6;
+  color: #241812;
+  border: 3px solid #8a672a;
+  border-radius: 3px;
+  padding: 8px 10px;
+  font-size: 12px;
+  line-height: 1.4;
+  min-height: 58px;
+  max-height: 96px;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: inset 0 0 0 2px #d9a441;
+}
+#dialogueBox .who { font-weight: bold; color: #c1502e; display: block; margin-bottom: 2px; }
+#dialogueBox.empty { color: #8a672a; font-style: italic; }
+
+/* spacer pushes controls to bottom */
+.spacer { flex: 1; }
+
+/* ---------- Minimap ---------- */
+#minimapWrap {
+  background: #1a1109;
+  border: 2px solid #4a3620;
+  border-radius: 4px;
+  padding: 6px;
+}
+#minimapWrap .mmTitle { color: #8a672a; font-size: 9px; letter-spacing: 2px; margin-bottom: 4px; }
+#minimap {
+  position: relative;
+  width: 100%;
+  height: 34px;
+  background: #241812;
+  border: 1px solid #3d2a1c;
+  border-radius: 3px;
+  overflow: hidden;
+}
+#minimapTrack {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+}
+.mmRoad {
+  position: absolute;
+  left: 0; right: 0; top: 15px; height: 4px;
+  background: #4a3620;
+}
+.mmDistrict {
+  position: absolute;
+  top: 3px;
+  transform: translateX(-50%);
+  font-size: 12px;
+  color: #4a3620;
+  opacity: 0.55;
+}
+.mmDistrict.visited { color: #d9a441; opacity: 1; }
+.mmPlayer {
+  position: absolute;
+  top: 20px;
+  width: 8px; height: 8px;
+  background: #c1502e;
+  border: 1px solid #eee2c6;
+  border-radius: 50%;
+  transform: translateX(-50%);
+  transition: left 0.08s linear;
+}
+.mmLocked {
+  position: absolute;
+  top: 0; bottom: 0;
+  background: repeating-linear-gradient(45deg, rgba(193,80,46,.25), rgba(193,80,46,.25) 4px, transparent 4px, transparent 8px);
+}
+
+/* ---------- Controls ---------- */
+#controls {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+#joystickZone {
+  width: 96px; height: 96px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #3d2a1c, #1a1109 70%);
+  border: 2px solid #8a672a;
+  position: relative;
+  flex-shrink: 0;
+  touch-action: none;
+}
+#joystickKnob {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #f0c876, #d9a441 70%);
+  border: 2px solid #8a672a;
+  position: absolute;
+  left: 28px; top: 28px;
+  box-shadow: 0 2px 4px rgba(0,0,0,.5);
+}
+
+.dpad {
+  display: grid;
+  grid-template-columns: repeat(3, 28px);
+  grid-template-rows: repeat(3, 28px);
+  gap: 3px;
+}
+.dpad button {
+  background: #3d2a1c;
+  border: 2px solid #8a672a;
+  color: #d9a441;
+  font-size: 13px;
+  border-radius: 4px;
+  padding: 0;
+  cursor: pointer;
+}
+.dpad button:active { background: #d9a441; color: #241812; }
+.dpad .up { grid-column: 2; grid-row: 1; }
+.dpad .left { grid-column: 1; grid-row: 2; }
+.dpad .center { grid-column: 2; grid-row: 2; visibility: hidden; }
+.dpad .right { grid-column: 3; grid-row: 2; }
+.dpad .down { grid-column: 2; grid-row: 3; }
+
+#interactBtn {
+  width: 60px; height: 60px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #e2703f, #c1502e 70%);
+  border: 3px solid #f0c876;
+  color: #eee2c6;
+  font-size: 10px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  cursor: pointer;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0,0,0,.5);
+}
+#interactBtn:active { filter: brightness(1.25); transform: scale(.96); }
+#interactBtn.pulse { animation: interactPulse 1s ease-in-out infinite; }
+@keyframes interactPulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(193,80,46,.6); }
+  50% { box-shadow: 0 0 0 8px rgba(193,80,46,0); }
+}
+
+#controlModeToggle {
+  align-self: center;
+  background: none;
+  border: 1px solid #4a3620;
+  color: #7a8f7f;
+  font-size: 9px;
+  padding: 3px 6px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+/* ===================== RIGHT VIEWPORT ===================== */
+#viewport {
+  flex: 1;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  background: #0d0906;
+}
+
+#gameCanvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+/* floating bot speech bubble drawn as HTML for crispness on interact */
+#speechBubble {
+  position: absolute;
+  display: none;
+  background: #eee2c6;
+  color: #241812;
+  border: 2px solid #241812;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 10px;
+  max-width: 140px;
+  transform: translate(-50%, -120%);
+  pointer-events: none;
+}
+#speechBubble::after {
+  content: "";
+  position: absolute;
+  left: 50%; bottom: -8px;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: #241812;
+}
+
+#zoneToast {
+  position: absolute;
+  top: 12px; left: 50%;
+  transform: translateX(-50%) translateY(-30px);
+  background: rgba(36,24,18,.9);
+  color: #d9a441;
+  border: 2px solid #d9a441;
+  padding: 5px 14px;
+  border-radius: 4px;
+  font-size: 12px;
+  letter-spacing: 1px;
+  opacity: 0;
+  transition: opacity .3s ease, transform .3s ease;
+  pointer-events: none;
+}
+#zoneToast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+#lockedToast {
+  position: absolute;
+  bottom: 14px; left: 50%;
+  transform: translateX(-50%);
+  background: rgba(36,24,18,.92);
+  color: #c1502e;
+  border: 2px solid #c1502e;
+  padding: 5px 12px;
+  border-radius: 4px;
+  font-size: 11px;
+  opacity: 0;
+  transition: opacity .3s ease;
+  pointer-events: none;
+}
+#lockedToast.show { opacity: 1; }
